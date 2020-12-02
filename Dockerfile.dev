@@ -1,0 +1,9 @@
+# Specify a base image
+FROM node:latest
+WORKDIR /app
+# Install dependencies
+COPY package.json .
+RUN npm install 
+COPY . .
+# Default command
+CMD ["npm", "run", "dev"]
