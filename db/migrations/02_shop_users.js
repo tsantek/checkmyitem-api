@@ -6,7 +6,7 @@ exports.up = function (knex) {
         table.string('password') // this is a column.
         table.string('name')
         table.string('address')
-        table.timestamps();
+        table.timestamps(true, true);
     })
 };
 exports.down = function (knex) {

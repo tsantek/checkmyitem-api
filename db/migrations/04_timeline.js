@@ -15,7 +15,7 @@ exports.up = function (knex) {
             .index();
         table.string('note') // this is a column.
         table.string('status') // this is a column.
-        table.timestamps();
+        table.timestamps(true, true);
     })
 };
 exports.down = function (knex) {

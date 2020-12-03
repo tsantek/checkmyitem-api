@@ -1,12 +1,15 @@
 exports.up = function (knex) {
     return knex.schema.createTable('items', table => {
-        table.increments('id') // this represents the primary key.
-        table.string('name') // this is a column.
-        table.string('serial') // this is a column.
-        table.string('status') // this is a column.
-        table.boolean('stolen') // this is a column.
-        table.string('images') // this is a column.
-        table.timestamps();
+        table.increments('id')
+        table.string('name')
+        table.string('serial')
+        table.string('status')
+        table.boolean('stolen')
+        table.string('images')
+        table.string('ipAddress')
+        table.string('user')
+        table.string('userInfo')
+        table.timestamps(true, true);
     })
 };
 exports.down = function (knex) {
