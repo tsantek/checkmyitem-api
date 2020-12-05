@@ -10,6 +10,9 @@ const signinRouter = require('./routers/signin.js')
 const signoutRouter = require('./routers/signout.js')
 const currentUserRouter = require('./routers/current-user.js')
 
+// errors
+const NotFoundError = require('./errors/not-found-error.js')
+
 // middlewares
 const errorHandler = require('./middlewares/error-handler.js')
 
@@ -41,9 +44,9 @@ app.use(signinRouter)
 app.use(signoutRouter)
 app.use(currentUserRouter)
 
-// app.all('*', async (req, res) => {
-//     throw new NotFoundError();
-// });
+app.all('*', (req, res) => {
+    throw new NotFoundError();
+});
 
 app.use(errorHandler)
 
