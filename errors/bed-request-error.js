@@ -1,12 +1,11 @@
 const CustomError = require('./custom-error')
 
 class BadRequestError extends CustomError {
-    statusCode = 200;
+    statusCode = 400;
 
     constructor(message) {
         super(message);
-        Object.setPrototypeOf(this, CustomError.prototype);
-        this.message = message
+        Object.setPrototypeOf(this, BadRequestError.prototype);
     }
 
     serializeErrors() {

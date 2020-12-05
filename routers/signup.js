@@ -19,9 +19,14 @@ signupRouter.post('/api/users/signup',
             .isLength({ min: 2 })
             .isString()
             .withMessage('Username is not valid'),
+        body('country')
+            .trim()
+            .isLength({ min: 2 })
+            .isString()
+            .withMessage('Username is not valid'),
     ], validateRequest,
     (req, res) => {
-        const { email, password, username } = req.body
+        const { email, password, username, country, organization, repairShop } = req.body
         knex.select("*")
             .from("users")
             .where("email", email)
@@ -32,16 +37,36 @@ signupRouter.post('/api/users/signup',
                         .insert([{
                             username,
                             email,
-                            password
+                            password,
+                            country,
+                            organization,
+                            repairShop
                         }])
                         .then((newUserId) => {
-                            console.log('inserted user', newUserId);
-                            res.sendStatus(200)
+                            const userID = newUserId[0];
+                            const accessToken = jwt.sign({
+                                id: newUserId,
+                                email,
+                                username,
+                            }, process.env.JWT_TOKEN)
+
+                            // Store token in cookie
+                            res.cookie('token', accessToken, { maxAge: 10 * 1000 })
+
+                            res.status(201).send({
+                                userID,
+                                email,
+                                username,
+                                country,
+                                organization,
+                                repairShop
+                            });
                         });
                 }
-                res.send("already there")
+                res.send([{ message: 'User exists' }])
             }).catch(err => {
-                res.sendStatus(500)
+                console.log(err)
+                res.send([{ message: 'Something when wrong!' }])
             })
     })
 

@@ -1,16 +1,16 @@
 exports.up = function (knex) {
     return knex.schema.createTable('timeline', table => {
         table.increments('id') // this represents the primary key.
-        table.integer("item_id")
+        table.integer("itemId")
             .notNullable()
             .references('id')
             .inTable('items')
             .onDelete('CASCADE')
             .index();
-        table.integer("shop_user_id")
+        table.integer("userId")
             .notNullable()
             .references('id')
-            .inTable('shop_users')
+            .inTable('users')
             .onDelete('CASCADE')
             .index();
         table.string('note') // this is a column.

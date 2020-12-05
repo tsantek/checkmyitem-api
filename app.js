@@ -19,8 +19,14 @@ require('dotenv').config();
 // create a server
 const app = express()
 
+// passport
+require('./middlewares/passport.js')
+
 // security
 app.use(helmet());
+
+app.set('trust proxy', true);
+
 
 // middlewares
 app.use(bodyParser.json());
