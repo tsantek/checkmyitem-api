@@ -1,8 +1,8 @@
 // imports
 const express = require('express')
 const bodyParser = require('body-parser')
-const cookieSession = require('cookie-session')
 const helmet = require("helmet");
+// const cookieSession = require('cookie-session')
 
 // routers
 const signupRouter = require('./routers/signup.js')
@@ -23,18 +23,13 @@ const app = express()
 // security
 app.use(helmet());
 
-app.set('trust proxy', true);
+// app.set('trust proxy', true);
 
 
 // middlewares
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: true
-}));
-
-app.use(cookieSession({
-    signed: false,
-    secure: process.env.NODE_ENV !== 'test',
 }));
 
 app.get('/', function (req, res) {

@@ -3,6 +3,8 @@ const signinRouter = express.Router()
 const jwt = require('jsonwebtoken')
 const { body } = require('express-validator')
 
+const Cookies = require('cookies')
+
 const knex = require('../db/knex.js')
 const validateRequest = require('../middlewares/validate-request')
 
@@ -30,8 +32,14 @@ signinRouter.post('/api/users/signin', [
                             username: user.email,
                         }, process.env.JWT_TOKEN)
 
-                        // Store token in cookie
-                        res.cookie('token', accessToken, { maxAge: 10 * 1000 })
+                        // Token in cookie
+                        new Cookies(req, res).set('accessToken', accessToken, {
+                            // Front-end JS can't read token
+                            // httpOnly: true,
+                            // Ability to replace cookie (logging out)
+                            overwrite: true,
+                            // maxAge: timeout
+                        })
 
                         const returnUser = {
                             userID: user.id,
@@ -48,6 +56,7 @@ signinRouter.post('/api/users/signin', [
                 }
             })
             .catch(err => {
+                console.log(err)
                 res.send([{ message: 'Something went wrong!' }])
             })
     }

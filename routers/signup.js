@@ -3,6 +3,8 @@ const signupRouter = express.Router()
 const knex = require('../db/knex.js')
 
 const { body } = require('express-validator')
+
+const Cookies = require('cookies')
 const jwt = require('jsonwebtoken')
 
 const validateRequest = require('./../middlewares/validate-request.js')
@@ -45,14 +47,20 @@ signupRouter.post('/api/users/signup',
                         .then((newUserId) => {
                             const userID = newUserId[0];
                             const accessToken = jwt.sign({
-                                id: newUserId,
+                                id: userID,
                                 email,
                                 username,
                             }, process.env.JWT_TOKEN)
 
                             // Store token in cookie
-                            res.cookie('token', accessToken, { maxAge: 10 * 1000 })
-
+                            // Token in cookie
+                            new Cookies(req, res).set('accessToken', accessToken, {
+                                // Front-end JS can't read token
+                                // httpOnly: true,
+                                // Ability to replace cookie (logging out)
+                                overwrite: true,
+                                // maxAge: timeout
+                            })
                             res.status(201).send({
                                 userID,
                                 email,
