@@ -1,8 +1,10 @@
 const express = require('express')
 const signoutRouter = express.Router()
 
-signoutRouter.get('/api/users/signout', function (req, res) {
-    res.send('sigout!')
+signoutRouter.post('/api/users/signout', function (req, res) {
+    req.session = null;
+
+    res.send([{}])
 })
 
 module.exports = signoutRouter

@@ -5,10 +5,10 @@ const cookieSession = require('cookie-session')
 const helmet = require("helmet");
 
 // routers
-// const signinRouter = require('./routers/signin.js')
 const signupRouter = require('./routers/signup.js')
-// const signoutRouter = require('./routers/signout.js')
-// const currentUserRouter = require('./routers/current-user.js')
+const signinRouter = require('./routers/signin.js')
+const signoutRouter = require('./routers/signout.js')
+const currentUserRouter = require('./routers/current-user.js')
 
 // middlewares
 const errorHandler = require('./middlewares/error-handler.js')
@@ -19,8 +19,6 @@ require('dotenv').config();
 // create a server
 const app = express()
 
-// passport
-require('./middlewares/passport.js')
 
 // security
 app.use(helmet());
@@ -44,9 +42,9 @@ app.get('/', function (req, res) {
 })
 
 app.use(signupRouter)
-// app.use(signinRouter)
-// app.use(currentUserRouter)
-// app.use(signoutRouter)
+app.use(signinRouter)
+app.use(signoutRouter)
+app.use(currentUserRouter)
 
 // app.all('*', async (req, res) => {
 //     throw new NotFoundError();

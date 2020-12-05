@@ -31,7 +31,7 @@ signupRouter.post('/api/users/signup',
             .from("users")
             .where("email", email)
             .then(userNameList => {
-                if (userNameList.length === 0) {
+                if (!userNameList.length) {
                     return knex('users')
                         .returning('id')
                         .insert([{

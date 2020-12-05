@@ -1,8 +1,13 @@
 const express = require('express')
 const currentUserRouter = express.Router()
 
-currentUserRouter.get('/api/users/currentuser', function (req, res) {
-    res.send('hello world current user')
-})
+// const currentUser = require('../middlewares/current-user.js')
+
+currentUserRouter.get('/api/users/currentuser',
+    function (req, res) {
+        console.log(req.headers.cookie)
+        res.send('hello world current user')
+        // res.send({ currentUser: req.currentUser || null });
+    })
 
 module.exports = currentUserRouter
