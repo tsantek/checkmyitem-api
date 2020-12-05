@@ -7,7 +7,11 @@ const currentUser = require('../middlewares/current-user.js')
 
 currentUserRouter.get('/api/users/currentuser', currentUser,
     function (req, res) {
-        res.send(req.currentUser || null);
+        if (req.currentUser) {
+            res.send(req.currentUser);
+        } else {
+            res.send(null);
+        }
     })
 
 module.exports = currentUserRouter

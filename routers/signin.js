@@ -56,7 +56,6 @@ signinRouter.post('/api/users/signin', [
                 }
             })
             .catch(err => {
-                console.log(err)
                 res.send([{ message: 'Something went wrong!' }])
             })
     }
