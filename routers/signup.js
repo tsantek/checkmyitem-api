@@ -7,6 +7,9 @@ const { body } = require('express-validator')
 const Cookies = require('cookies')
 const jwt = require('jsonwebtoken')
 
+
+const BadRequestError = require('../errors/bed-request-error.js')
+
 const validateRequest = require('./../middlewares/validate-request.js')
 
 signupRouter.post('/api/users/signup',
@@ -27,9 +30,9 @@ signupRouter.post('/api/users/signup',
             .isString()
             .withMessage('Username is not valid'),
     ], validateRequest,
-    (req, res) => {
+    async (req, res, next) => {
         const { email, password, username, country, organization, repairShop } = req.body
-        knex.select("*")
+        await knex.select("*")
             .from("users")
             .where("email", email)
             .then(userNameList => {
@@ -52,7 +55,6 @@ signupRouter.post('/api/users/signup',
                                 username,
                             }, process.env.JWT_TOKEN)
 
-                            // Store token in cookie
                             // Token in cookie
                             new Cookies(req, res).set('accessToken', accessToken, {
                                 // Front-end JS can't read token
@@ -71,11 +73,8 @@ signupRouter.post('/api/users/signup',
                             });
                         });
                 }
-                res.send([{ message: 'User exists' }])
-            }).catch(err => {
-                console.log(err)
-                res.send([{ message: 'Something when wrong!' }])
-            })
+                throw new BadRequestError('User exists')
+            }).catch(next)
     })
 
 

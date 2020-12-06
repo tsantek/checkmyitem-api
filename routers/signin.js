@@ -5,6 +5,8 @@ const { body } = require('express-validator')
 
 const Cookies = require('cookies')
 
+const BadRequestError = require('../errors/bed-request-error.js')
+
 const knex = require('../db/knex.js')
 const validateRequest = require('../middlewares/validate-request')
 
@@ -12,17 +14,17 @@ signinRouter.post('/api/users/signin', [
     body('email').isEmail().withMessage('Email must be valid'),
     body('password').trim().notEmpty().withMessage('You must enter the password!'),
 ], validateRequest,
-    (req, res) => {
+    async (req, res, next) => {
         const { email, password } = req.body;
 
         // hash password
-        knex.select("*")
+        await knex.select("*")
             .from("users")
             .where("email", email)
             .where("password", password)
             .then(users => {
                 if (!users.length) {
-                    res.send([{ message: 'Wrong credentials!' }])
+                    throw new BadRequestError('Wrong credentials')
                 } else {
                     if (users.length === 1) {
                         const user = users[0];
@@ -51,13 +53,11 @@ signinRouter.post('/api/users/signin', [
                         }
                         res.status(200).send(returnUser);
                     } else {
-                        res.send([{ message: 'Something went wrong!' }])
+                        throw new BadRequestError('Something went wrong!')
                     }
                 }
             })
-            .catch(err => {
-                res.send([{ message: 'Something went wrong!' }])
-            })
+            .catch(next)
     }
 )
 module.exports = signinRouter
