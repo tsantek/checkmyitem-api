@@ -4,12 +4,6 @@ const bodyParser = require('body-parser')
 const helmet = require("helmet");
 // const cookieSession = require('cookie-session')
 
-// routers
-const signupRouter = require('./routers/signup.js')
-const signinRouter = require('./routers/signin.js')
-const signoutRouter = require('./routers/signout.js')
-const currentUserRouter = require('./routers/current-user.js')
-
 // errors
 const NotFoundError = require('./errors/not-found-error.js')
 
@@ -39,10 +33,10 @@ app.get('/', function (req, res) {
     res.send('Welcome to API')
 })
 
-app.use(signupRouter)
-app.use(signinRouter)
-app.use(signoutRouter)
-app.use(currentUserRouter)
+const apiRoutes = require('./api/index.js')
+
+app.use('/api', apiRoutes)
+
 
 app.all('*', (req, res) => {
     throw new NotFoundError();
