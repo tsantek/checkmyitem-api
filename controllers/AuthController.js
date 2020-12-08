@@ -11,44 +11,40 @@ const BadRequestError = require('../errors/bed-request-error.js')
 // const knex = require('../db/knex.js')
 
 
-// const login = async (req, res, next) => {
-//     await Users.then(users => {
-//         if (!users.length) {
-//             throw new BadRequestError('Wrong credentials')
-//         } else {
-//             if (users.length === 1) {
-//                 const user = users[0];
-//                 const accessToken = jwt.sign({
-//                     id: user.id,
-//                     email: user.email,
-//                     username: user.email,
-//                 }, process.env.JWT_TOKEN)
+const login = async (req, res, next) => {
+    const { email, password } = req.body
+    await Users.findOne({ where: { email: email } }).then(
+        (user) => {
+            if (!user) {
+                throw new BadRequestError('Wrong credentials')
+            } else {
+                const accessToken = jwt.sign({
+                    id: user.id,
+                    email: user.email,
+                    username: user.email,
+                }, process.env.JWT_TOKEN)
+                // Token in cookie
+                new Cookies(req, res).set('accessToken', accessToken, {
+                    // Front-end JS can't read token
+                    // httpOnly: true,
+                    // Ability to replace cookie (logging out)
+                    overwrite: true,
+                    // maxAge: timeout
+                })
 
-//                 // Token in cookie
-//                 new Cookies(req, res).set('accessToken', accessToken, {
-//                     // Front-end JS can't read token
-//                     // httpOnly: true,
-//                     // Ability to replace cookie (logging out)
-//                     overwrite: true,
-//                     // maxAge: timeout
-//                 })
-
-//                 const returnUser = {
-//                     userID: user.id,
-//                     email: user.email,
-//                     username: user.username,
-//                     country: user.country,
-//                     organization: user.organization,
-//                     repairShop: user.repairShop
-//                 }
-//                 res.status(200).send(returnUser);
-//             } else {
-//                 throw new BadRequestError('Something went wrong!')
-//             }
-//         }
-//     })
-//         .catch(next)
-// }
+                const returnUser = {
+                    userID: user.id,
+                    email: user.email,
+                    username: user.username,
+                    country: user.country,
+                    organization: user.organization,
+                    repairShop: user.repairShop
+                }
+                res.status(200).send(returnUser);
+            }
+        }
+    ).catch(next)
+}
 
 
 
@@ -118,7 +114,7 @@ const verify = (req, res) => {
 }
 
 module.exports = {
-    // login,
+    login,
     signup,
     signout,
     verify

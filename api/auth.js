@@ -11,7 +11,7 @@ const currentUser = require('../middlewares/current-user');
 
 
 router.get('/verify', currentUser, AuthController.verify);
-// router.post('/login', validateUserInput.validateEmailPassword(), validateRequest, AuthController.login);
+router.post('/login', validateUserInput.validateEmailPassword(), validateRequest, AuthController.login);
 router.post('/signup', validateUserInput.validateEmailPasswordUsernameCountry(), validateRequest, AuthController.signup);
 router.post('/signout', AuthController.signout);
 
