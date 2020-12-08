@@ -1,29 +1,79 @@
+const db = require("../models/index.js");
+const Users = db.Users;
+const Op = db.Sequelize.Op;
+
 const Cookies = require('cookies')
 const jwt = require('jsonwebtoken')
 
 const BadRequestError = require('../errors/bed-request-error.js')
 
-const knex = require('../db/knex.js')
+// REMOVE
+// const knex = require('../db/knex.js')
 
 
-const login = async (req, res, next) => {
-    const { email, password } = req.body;
+// const login = async (req, res, next) => {
+//     await Users.then(users => {
+//         if (!users.length) {
+//             throw new BadRequestError('Wrong credentials')
+//         } else {
+//             if (users.length === 1) {
+//                 const user = users[0];
+//                 const accessToken = jwt.sign({
+//                     id: user.id,
+//                     email: user.email,
+//                     username: user.email,
+//                 }, process.env.JWT_TOKEN)
 
-    // hash password
-    await knex.select("*")
-        .from("users")
-        .where("email", email)
-        .where("password", password)
-        .then(users => {
-            if (!users.length) {
-                throw new BadRequestError('Wrong credentials')
-            } else {
-                if (users.length === 1) {
-                    const user = users[0];
+//                 // Token in cookie
+//                 new Cookies(req, res).set('accessToken', accessToken, {
+//                     // Front-end JS can't read token
+//                     // httpOnly: true,
+//                     // Ability to replace cookie (logging out)
+//                     overwrite: true,
+//                     // maxAge: timeout
+//                 })
+
+//                 const returnUser = {
+//                     userID: user.id,
+//                     email: user.email,
+//                     username: user.username,
+//                     country: user.country,
+//                     organization: user.organization,
+//                     repairShop: user.repairShop
+//                 }
+//                 res.status(200).send(returnUser);
+//             } else {
+//                 throw new BadRequestError('Something went wrong!')
+//             }
+//         }
+//     })
+//         .catch(next)
+// }
+
+
+
+const signup = async (req, res, next) => {
+    const { email, password, username, country, organization, repairShop } = req.body
+    await Users.findOne({ where: { email: email } }).then(userNameList => {
+        console.log(userNameList)
+        if (!userNameList) {
+            // Create a Tutorial
+            const user = {
+                username,
+                email,
+                password,
+                country,
+                organization,
+                repairShop
+            };
+            // Save Tutorial in the database
+            Users.create(user)
+                .then(data => {
+                    const id = data.id
                     const accessToken = jwt.sign({
-                        id: user.id,
-                        email: user.email,
-                        username: user.email,
+                        id,
+                        email,
+                        username,
                     }, process.env.JWT_TOKEN)
 
                     // Token in cookie
@@ -34,71 +84,19 @@ const login = async (req, res, next) => {
                         overwrite: true,
                         // maxAge: timeout
                     })
-
-                    const returnUser = {
-                        userID: user.id,
-                        email: user.email,
-                        username: user.username,
-                        country: user.country,
-                        organization: user.organization,
-                        repairShop: user.repairShop
-                    }
-                    res.status(200).send(returnUser);
-                } else {
-                    throw new BadRequestError('Something went wrong!')
-                }
-            }
-        })
-        .catch(next)
-}
-
-
-
-const signup = async (req, res, next) => {
-    const { email, password, username, country, organization, repairShop } = req.body
-    await knex.select("*")
-        .from("users")
-        .where("email", email)
-        .then(userNameList => {
-            if (!userNameList.length) {
-                return knex('users')
-                    .returning('id')
-                    .insert([{
-                        username,
+                    res.status(201).send({
+                        id,
                         email,
-                        password,
+                        username,
                         country,
                         organization,
                         repairShop
-                    }])
-                    .then((newUserId) => {
-                        const userID = newUserId[0];
-                        const accessToken = jwt.sign({
-                            id: userID,
-                            email,
-                            username,
-                        }, process.env.JWT_TOKEN)
-
-                        // Token in cookie
-                        new Cookies(req, res).set('accessToken', accessToken, {
-                            // Front-end JS can't read token
-                            // httpOnly: true,
-                            // Ability to replace cookie (logging out)
-                            overwrite: true,
-                            // maxAge: timeout
-                        })
-                        res.status(201).send({
-                            userID,
-                            email,
-                            username,
-                            country,
-                            organization,
-                            repairShop
-                        });
                     });
-            }
+                })
+        } else {
             throw new BadRequestError('User exists')
-        }).catch(next)
+        }
+    }).catch(next)
 }
 
 
@@ -120,7 +118,7 @@ const verify = (req, res) => {
 }
 
 module.exports = {
-    login,
+    // login,
     signup,
     signout,
     verify
