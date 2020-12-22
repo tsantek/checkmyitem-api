@@ -33,7 +33,7 @@ const db = require('./models/index.js');
 // db.sequelize.sync();
 
 // REMOVE ON THE END
-db.sequelize.sync({ force: true }).then(() => {
+db.sequelize.sync({ force: false }).then(() => {
     console.log("Drop and re-sync db.");
 });
 

@@ -5,11 +5,8 @@ const Op = db.Sequelize.Op;
 const Cookies = require('cookies')
 const jwt = require('jsonwebtoken')
 
-const BadRequestError = require('../errors/bed-request-error.js')
-
-// REMOVE
-// const knex = require('../db/knex.js')
-
+const BadRequestError = require('../errors/bed-request-error.js');
+const Password = require('../utils/encryption/password')
 
 const login = async (req, res, next) => {
     const { email, password } = req.body
@@ -18,29 +15,37 @@ const login = async (req, res, next) => {
             if (!user) {
                 throw new BadRequestError('Wrong credentials')
             } else {
-                const accessToken = jwt.sign({
-                    id: user.id,
-                    email: user.email,
-                    username: user.email,
-                }, process.env.JWT_TOKEN)
-                // Token in cookie
-                new Cookies(req, res).set('accessToken', accessToken, {
-                    // Front-end JS can't read token
-                    // httpOnly: true,
-                    // Ability to replace cookie (logging out)
-                    overwrite: true,
-                    // maxAge: timeout
+                Password.compare(user.password, password).then(hash => {
+                    if (hash) {
+                        const accessToken = jwt.sign({
+                            id: user.id,
+                            email: user.email,
+                            username: user.email,
+                        }, process.env.JWT_TOKEN)
+                        // Token in cookie
+                        new Cookies(req, res).set('accessToken', accessToken, {
+                            // Front-end JS can't read token
+                            // httpOnly: true,
+                            // Ability to replace cookie (logging out)
+                            overwrite: true,
+                            // maxAge: timeout
+                        })
+
+                        const returnUser = {
+                            userID: user.id,
+                            email: user.email,
+                            username: user.username,
+                            country: user.country,
+                            organization: user.organization,
+                            repairShop: user.repairShop
+                        }
+                        res.status(200).send(returnUser);
+                    } else {
+                        throw new BadRequestError('Wrong credentials')
+                    }
                 })
 
-                const returnUser = {
-                    userID: user.id,
-                    email: user.email,
-                    username: user.username,
-                    country: user.country,
-                    organization: user.organization,
-                    repairShop: user.repairShop
-                }
-                res.status(200).send(returnUser);
+
             }
         }
     ).catch(next)
@@ -50,14 +55,13 @@ const login = async (req, res, next) => {
 
 const signup = async (req, res, next) => {
     const { email, password, username, country, organization, repairShop } = req.body
+    const hashPassword = await Password.toHash(password)
     await Users.findOne({ where: { email: email } }).then(userNameList => {
-        console.log(userNameList)
         if (!userNameList) {
-            // Create a Tutorial
             const user = {
                 username,
                 email,
-                password,
+                password: hashPassword,
                 country,
                 organization,
                 repairShop
