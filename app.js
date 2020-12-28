@@ -1,5 +1,6 @@
 // imports
 const express = require('express')
+var cors = require('cors')
 const bodyParser = require('body-parser')
 const helmet = require("helmet");
 const logger = require('morgan');
@@ -14,6 +15,8 @@ const errorHandler = require('./middlewares/error-handler.js')
 // create a server
 const app = express()
 
+// cors
+app.use(cors())
 
 // security
 app.use(helmet());
@@ -46,7 +49,6 @@ const apiRoutes = require('./api/index.js')
 
 // REMOVE
 // require('./api/user.js')(app);
-
 app.use('/api', apiRoutes)
 
 
