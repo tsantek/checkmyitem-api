@@ -15,8 +15,8 @@ const errorHandler = require('./middlewares/error-handler.js')
 // create a server
 const app = express()
 
-// cors
-app.use(cors())
+// cors   
+app.use(cors({ credentials: true, origin: true }));
 
 // security
 app.use(helmet());

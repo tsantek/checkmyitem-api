@@ -94,7 +94,7 @@ const signup = async (req, res, next) => {
                     });
                 })
         } else {
-            throw new BadRequestError('User exists')
+            throw new BadRequestError('User with this email exists')
         }
     }).catch(next)
 }
