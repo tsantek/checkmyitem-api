@@ -18,12 +18,8 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             required: true
         },
-        stolen: {
-            type: DataTypes.BOOLEAN,
-            required: true
-        },
-        stolen: {
-            type: DataTypes.BOOLEAN,
+        description: {
+            type: DataTypes.TEXT,
             required: true
         },
         stolen: {

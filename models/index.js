@@ -29,6 +29,7 @@ db.Sales = require('./sales.js')(sequelize, Sequelize)
 //Models/tables
 db.Users.hasMany(db.Owners);
 db.Items.hasMany(db.Owners);
+db.Owners.belongsTo(db.Items);
 db.Users.hasMany(db.Sales);
 db.Items.hasMany(db.Sales);
 db.Users.hasMany(db.Timelines);
