@@ -1,3 +1,4 @@
+const { response } = require("express");
 const { Users } = require("../models/index.js");
 const db = require("../models/index.js");
 const Items = db.Items;
@@ -15,10 +16,10 @@ const addNewItem = async (req, res, next) => {
         description
     }
     await Items.create(item).then(data => {
-        const itemId = data.id
-        Owners.create({ item_id: itemId, user_id: userId }).then((owner) => {
+        const id = data.id
+        Owners.create({ item_id: id, user_id: userId }).then((owner) => {
             res.status(201).send({
-                itemId,
+                id,
                 name,
                 serial,
                 status,
@@ -33,13 +34,13 @@ const addNewItem = async (req, res, next) => {
 
 
 const findMyItems = async (req, res, next) => {
-    console.log(req.currentUser.id)
     await Owners.findAll({
         where: { user_id: req.currentUser.id },
         include: [{
             model: db.Items,
             required: true
-        }]
+        }],
+        order: [['createdAt', 'DESC']]
     }).then(
         (item) => {
             if (!item) {
@@ -53,10 +54,35 @@ const findMyItems = async (req, res, next) => {
     ).catch((err) => console.log(err))
 }
 
+const findOneItem = async (req, res, next) => {
+    // console.log(req.currentUser.id)
+    await Items.findOne({ where: { id: req.query.id } })
+        .then(response => {
+            if (!response) {
+                throw new BadRequestError(`Sorry!!`)
+            } else {
+                if (req.currentUser) {
+                    Owners.findOne({ where: { user_id: req.currentUser.id, item_id: req.query.id } })
+                        .then(find => {
+                            if (!find) {
+                                res.status(200).send(response)
+                            } else {
+                                response.dataValues.currentUser = true;
+                                res.status(200).send(response)
+                            }
 
+                        }).catch(next)
+                } else {
+                    res.status(200).send(response)
+                }
+            }
 
+        })
+        .catch(next)
+}
 
 module.exports = {
     addNewItem,
-    findMyItems
+    findMyItems,
+    findOneItem
 }
