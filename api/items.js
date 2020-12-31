@@ -13,7 +13,7 @@ const currentUser = require('../middlewares/current-user');
 router.get('/myitems', currentUser, ItemsController.findMyItems);
 router.get('/item', currentUser, ItemsController.findOneItem);
 router.post('/add', validateRequest, ItemsController.addNewItem);
-
+router.get('/search', ItemsController.mainSearch);
 // router.post('/signup', validateUserInput.validateEmailPasswordUsernameCountry(), validateRequest, AuthController.signup);
 // router.post('/signout', AuthController.signout);
 

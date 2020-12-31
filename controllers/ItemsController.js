@@ -7,7 +7,6 @@ const Op = db.Sequelize.Op;
 
 const addNewItem = async (req, res, next) => {
     const { name, serial, status, stolen, description, userId } = req.body
-
     const item = {
         name,
         serial,
@@ -17,7 +16,7 @@ const addNewItem = async (req, res, next) => {
     }
     await Items.create(item).then(data => {
         const id = data.id
-        Owners.create({ item_id: id, user_id: userId }).then((owner) => {
+        Owners.create({ item_id: id, user_id: userId }).then(() => {
             res.status(201).send({
                 id,
                 name,
@@ -27,8 +26,7 @@ const addNewItem = async (req, res, next) => {
                 description
             })
         }
-
-        ).catch(next)
+        ).catch(err => console.log(err))
     }).catch(next)
 }
 
@@ -55,7 +53,6 @@ const findMyItems = async (req, res, next) => {
 }
 
 const findOneItem = async (req, res, next) => {
-    // console.log(req.currentUser.id)
     await Items.findOne({ where: { id: req.query.id } })
         .then(response => {
             if (!response) {
@@ -81,8 +78,19 @@ const findOneItem = async (req, res, next) => {
         .catch(next)
 }
 
+const mainSearch = async (req, res, next) => {
+    const search = req.query.search
+    console.log(req.query.search)
+    await Items.findAll({ where: { serial: search } })
+        .then(items => {
+            res.status(200).send(items)
+        })
+        .catch(err => console.log(err))
+}
+
 module.exports = {
     addNewItem,
     findMyItems,
-    findOneItem
+    findOneItem,
+    mainSearch
 }
